@@ -35,10 +35,9 @@ O projeto está organizado da seguinte forma:
 ├── docker-compose.yml        # Orquestra os contêineres do MongoDB e do script.
 ├── Dockerfile                # Define como construir a imagem do nosso script de migração.
 ├── requirements.txt          # Lista as dependências Python (pymongo, pandas, etc.).
-├── .env                      # Arquivo para armazenar as credenciais (NÃO DEVE SER ENVIADO AO GITHUB).
 │
 ├── migracao.py  # Script principal que lê os arquivos e popula o MongoDB.
-├── consultas_tematicas_finais.py # Script para executar as 5 consultas analíticas no banco já populado.
+├── consultas.py # Script para executar as 5 consultas analíticas no banco já populado.
 │
 ├── /datasets/                # Pasta contendo os arquivos de dados necessários.
 │   ├── microdados_ed_basica_2023.csv
