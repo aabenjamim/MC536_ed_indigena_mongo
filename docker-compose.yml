@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  # Serviço de Destino: MongoDB
+  mongo:
+    image: mongo:6.0
+    container_name: mongodb_final
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  # Serviço de Migração: Script Python
+  migrador:
+    build: .
+    # O migrador depende que o banco MongoDB esteja pronto
+    depends_on:
+      - mongo
+    # Monta a pasta de datasets para o script poder ler os arquivos
+    volumes:
+      - ./datasets:/app/datasets
+
+volumes:
+  mongo-data:
