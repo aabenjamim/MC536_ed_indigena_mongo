@@ -168,7 +168,7 @@ Estrutura do Documento:
 
 ### ❓ Consultas Analíticas
 
-O script `consultas.py` executa 5 consultas complexas para responder a perguntas relevantes sobre o tema do projeto, como:
+O script `consultas.py` executa 6 consultas complexas para responder a perguntas relevantes sobre o tema do projeto, como:
 
 #### Painel da Região Norte: 
 Qual o ranking de UFs por número de alunos indígenas e qual a distribuição de escolas indígenas por tipo de administração?
@@ -180,3 +180,5 @@ Quais municípios de alta população indígena também apresentam baixos indica
 Municípios com maior % de população indígena possuem, de fato, uma maior proporção de escolas indígenas?
 #### Polos Educacionais: 
 Quais municípios são os maiores "polos" de educação indígena, com base em um score que considera escolas, alunos e turmas?
+#### Cobertura Educacional por Território: 
+Qual é o ranking dos estados com melhor cobertura educacional indígena, considerando quantas escolas e alunos indígenas existem por território identificado?

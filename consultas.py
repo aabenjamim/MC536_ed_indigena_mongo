@@ -155,6 +155,90 @@ pipeline5 = [
 ]
 pprint(list(db.Escolas.aggregate(pipeline5)))
 
+# --- Consulta 6: Ranking Simples de Estados com Territórios Indígenas ---
+print("\n\n[Consulta 6: Ranking de Estados por Cobertura Educacional Indígena]")
+pipeline6 = [
+    # Agrupa territórios por estado
+    { "$group": {
+        "_id": {
+            "estado": "$uf_sigla",
+            "regiao": "$regiao_nome"
+        },
+        "total_territorios": { "$sum": 1 }
+    }},
+    
+    # Busca dados educacionais do estado
+    { "$lookup": {
+        "from": "Escolas",
+        "let": { "estado_uf": "$_id.estado" },
+        "pipeline": [
+            { "$match": { "$expr": { "$eq": ["$uf_sigla", "$$estado_uf"] } } },
+            { "$match": { "indigena": True } },
+            { "$unwind": "$matriculas" }
+        ],
+        "as": "escolas_indigenas"
+    }},
+    
+    # Calcula métricas simples
+    { "$addFields": {
+        "total_escolas_indigenas": {
+            "$size": {
+                "$setUnion": [
+                    { "$map": { 
+                        "input": "$escolas_indigenas", 
+                        "as": "escola", 
+                        "in": "$$escola._id" 
+                    }}, 
+                    []
+                ] 
+            }
+        },
+        "total_alunos_indigenas": { "$sum": "$escolas_indigenas.matriculas.qt_matriculas_indigenas" }
+    }},
+    
+    # Calcula indicadores finais
+    { "$addFields": {
+        "escolas_por_territorio": {
+            "$round": [
+                { "$divide": ["$total_escolas_indigenas", "$total_territorios"] }, 
+                1
+            ]
+        },
+        "alunos_por_territorio": {
+            "$round": [
+                { "$divide": ["$total_alunos_indigenas", "$total_territorios"] }, 
+                0
+            ]
+        }
+    }},
+    
+    # Filtra estados com pelo menos algumas escolas
+    { "$match": { "total_escolas_indigenas": { "$gte": 10 } } },
+    
+    # Ordena por escolas por território
+    { "$sort": { "escolas_por_territorio": -1 } },
+    { "$limit": 10 },
+    
+    # Saída
+    { "$project": {
+        "_id": 0,
+        "Estado": "$_id.estado",
+        "Região": "$_id.regiao", 
+        "Territórios": "$total_territorios",
+        "Escolas Indígenas": "$total_escolas_indigenas",
+        "Alunos Indígenas": "$total_alunos_indigenas",
+        "Escolas/Território": "$escolas_por_territorio",
+        "Alunos/Território": "$alunos_por_territorio"
+    }}
+]
+
+print("📋 INTERPRETAÇÃO: Estados com melhor infraestrutura educacional por território indígena")
+print("   • Escolas/Território: Quantas escolas indígenas existem para cada território")
+print("   • Alunos/Território: Quantos alunos indígenas há por território no estado")
+print("   • Valores maiores = melhor cobertura educacional\n")
+
+pprint(list(db.TerritoriosIndigenas.aggregate(pipeline6)))
+
 # --- Fim ---
 print("\n--- CONSULTAS TEMÁTICAS AVANÇADAS CONCLUÍDAS ---")
 client.close()
